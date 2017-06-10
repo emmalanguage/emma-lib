@@ -1,0 +1,26 @@
+.cache
+.classpath
+.idea/*
+.idea/fileTemplates/*
+.metadata/*
+.project
+.settings
+target
+*.swp
+*.class
+*.iml
+dependency-reduced-pom.xml
+
+# Notebooks
+**/.ipynb_checkpoints
+
+# Ensime specific
+.ensime
+.ensime_cache
+
+# Include some IntelliJ settings
+!.idea/codeStyleSettings.xml
+!.idea/copyright/
+!.idea/fileTemplates/
+!.idea/fileTemplates/internal/
+!.idea/inspectionProfiles/
