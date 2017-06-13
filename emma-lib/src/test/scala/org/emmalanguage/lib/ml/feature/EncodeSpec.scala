@@ -22,7 +22,7 @@ import lib.ml.util
 
 import breeze.linalg._
 
-class HashSpec extends FeatureSpec {
+class EncodeSpec extends FeatureSpec {
 
   it should "hash count" in {
     val exp = hashes(false)
@@ -49,9 +49,9 @@ class HashSpec extends FeatureSpec {
   protected final def hashes(bin: Boolean) = for {
     (tokens, id) <- tokenss.zipWithIndex
   } yield {
-    val kx = (x: String) => util.nonNegativeMod(hash.native(x), hash.card)
+    val kx = (x: String) => util.nonNegativeMod(encode.native(x), encode.card)
     val rs = tokens.groupBy(kx).mapValues(_.length)
-    val vb = new VectorBuilder[Double](hash.card)
+    val vb = new VectorBuilder[Double](encode.card)
     rs.foreach({ case (k, v) => vb.add(k, if (bin) 1.0 else v) })
     SPoint(id, vb.toSparseVector())
   }
@@ -59,14 +59,14 @@ class HashSpec extends FeatureSpec {
   protected def count(xs: Seq[(Array[String], Int)]) = {
     val rs = for {
       (tokens, id) <- DataBag(xs)
-    } yield SPoint(id, hash.count[String]()(tokens))
+    } yield SPoint(id, encode.count[String]()(tokens))
     rs.collect()
   }
 
   protected def bin(xs: Seq[(Array[String], Int)]) = {
     val rs = for {
       (tokens, id) <- DataBag(xs)
-    } yield SPoint(id, hash.bin[String]()(tokens))
+    } yield SPoint(id, encode.bin[String]()(tokens))
     rs.collect()
   }
 }
