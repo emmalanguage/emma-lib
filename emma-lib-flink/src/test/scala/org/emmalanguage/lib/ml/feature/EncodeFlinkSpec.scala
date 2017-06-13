@@ -21,11 +21,11 @@ import lib.ml.SPoint
 
 class EncodeFlinkSpec extends EncodeSpec with FlinkAware {
 
-  override protected def count(xs: Seq[(Array[String], Int)]) =
+  override protected def freq(xs: Seq[(Array[String], Int)]) =
     withDefaultFlinkEnv(implicit flink => emma.onFlink {
       val rs = for {
         (tokens, id) <- DataBag(xs)
-      } yield SPoint(id, encode.count[String]()(tokens))
+      } yield SPoint(id, encode.freq[String]()(tokens))
       rs.collect()
     })
 
