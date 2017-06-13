@@ -24,9 +24,9 @@ import breeze.linalg._
 
 class EncodeSpec extends FeatureSpec {
 
-  it should "hash count" in {
+  it should "hash freq" in {
     val exp = hashes(false)
-    val act = count(tokenss.zipWithIndex)
+    val act = freq(tokenss.zipWithIndex)
     act.map(_.id) shouldEqual exp.map(_.id)
     for ((v, w) <- act.map(_.pos) zip exp.map(_.pos)) {
       v.dat.toList shouldEqual w.dat.toList
@@ -56,10 +56,10 @@ class EncodeSpec extends FeatureSpec {
     SPoint(id, vb.toSparseVector())
   }
 
-  protected def count(xs: Seq[(Array[String], Int)]) = {
+  protected def freq(xs: Seq[(Array[String], Int)]) = {
     val rs = for {
       (tokens, id) <- DataBag(xs)
-    } yield SPoint(id, encode.count[String]()(tokens))
+    } yield SPoint(id, encode.freq[String]()(tokens))
     rs.collect()
   }
 

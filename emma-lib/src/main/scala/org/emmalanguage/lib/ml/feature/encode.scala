@@ -30,7 +30,7 @@ object encode {
 
   val native = (x: Any) => x.hashCode()
 
-  def count[A](N: Int = card, h: A => Int = native)(xs: Array[A]): SparseVector[Double] =
+  def freq[A](N: Int = card, h: A => Int = native)(xs: Array[A]): SparseVector[Double] =
     encode(N, h, (i: Int, F: Map[Int, Double]) => F.getOrElse(i, 0.0) + 1.0)(xs)
 
   def bin[A](N: Int = card, h: A => Int = native)(xs: Array[A]): SparseVector[Double] =
