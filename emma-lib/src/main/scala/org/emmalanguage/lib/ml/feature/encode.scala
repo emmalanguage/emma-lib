@@ -24,17 +24,17 @@ import breeze.linalg._
 import collection.Map
 
 @emma.lib
-object hash {
+object encode {
 
   val card = 1 << 10
 
   val native = (x: Any) => x.hashCode()
 
   def count[A](N: Int = card, h: A => Int = native)(xs: Array[A]): SparseVector[Double] =
-    hash(N, h, (i: Int, F: Map[Int, Double]) => F.getOrElse(i, 0.0) + 1.0)(xs)
+    encode(N, h, (i: Int, F: Map[Int, Double]) => F.getOrElse(i, 0.0) + 1.0)(xs)
 
   def bin[A](N: Int = card, h: A => Int = native)(xs: Array[A]): SparseVector[Double] =
-    hash(N, h, (_: Int, _: Map[Int, Double]) => 1.0)(xs)
+    encode(N, h, (_: Int, _: Map[Int, Double]) => 1.0)(xs)
 
   def apply[A](
     N: Int = card,
