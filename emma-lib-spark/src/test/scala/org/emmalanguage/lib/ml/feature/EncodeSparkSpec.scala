@@ -19,13 +19,13 @@ package lib.ml.feature
 import api._
 import lib.ml.SPoint
 
-class HashSparkSpec extends HashSpec with SparkAware {
+class EncodeSparkSpec extends EncodeSpec with SparkAware {
 
-  override protected def count(xs: Seq[(Array[String], Int)]) =
+  override protected def freq(xs: Seq[(Array[String], Int)]) =
     withDefaultSparkSession(implicit spark => emma.onSpark {
       val rs = for {
         (tokens, id) <- DataBag(xs)
-      } yield SPoint(id, hash.count[String]()(tokens))
+      } yield SPoint(id, encode.freq[String]()(tokens))
       rs.collect()
     })
 
@@ -33,7 +33,27 @@ class HashSparkSpec extends HashSpec with SparkAware {
     withDefaultSparkSession(implicit spark => emma.onSpark {
       val rs = for {
         (tokens, id) <- DataBag(xs)
-      } yield SPoint(id, hash.bin[String]()(tokens))
+      } yield SPoint(id, encode.bin[String]()(tokens))
+      rs.collect()
+    })
+
+  override protected def freq(
+    dict: collection.Map[String, Int],
+    xs: Seq[(Array[String], Int)]) =
+    withDefaultSparkSession(implicit spark => emma.onSpark {
+      val rs = for {
+        (tokens, id) <- DataBag(xs)
+      } yield SPoint(id, encode.freq[String](dict)(tokens))
+      rs.collect()
+    })
+
+  override protected def bin(
+    dict: collection.Map[String, Int],
+    xs: Seq[(Array[String], Int)]) =
+    withDefaultSparkSession(implicit spark => {
+      val rs = for {
+        (tokens, id) <- DataBag(xs)
+      } yield SPoint(id, encode.bin[String](dict)(tokens))
       rs.collect()
     })
 }
