@@ -36,4 +36,24 @@ class EncodeSparkSpec extends EncodeSpec with SparkAware {
       } yield SPoint(id, encode.bin[String]()(tokens))
       rs.collect()
     })
+
+  override protected def freq(
+    dict: collection.Map[String, Int],
+    xs: Seq[(Array[String], Int)]) =
+    withDefaultSparkSession(implicit spark => emma.onSpark {
+      val rs = for {
+        (tokens, id) <- DataBag(xs)
+      } yield SPoint(id, encode.freq[String](dict)(tokens))
+      rs.collect()
+    })
+
+  override protected def bin(
+    dict: collection.Map[String, Int],
+    xs: Seq[(Array[String], Int)]) =
+    withDefaultSparkSession(implicit spark => {
+      val rs = for {
+        (tokens, id) <- DataBag(xs)
+      } yield SPoint(id, encode.bin[String](dict)(tokens))
+      rs.collect()
+    })
 }

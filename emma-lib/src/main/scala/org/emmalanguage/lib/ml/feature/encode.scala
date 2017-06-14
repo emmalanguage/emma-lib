@@ -22,6 +22,7 @@ import lib.ml.util
 import breeze.linalg._
 
 import collection.Map
+import scala.collection.breakOut
 
 @emma.lib
 object encode {
@@ -33,28 +34,43 @@ object encode {
   def freq[A](N: Int = card, h: A => Int = native)(xs: Array[A]): SparseVector[Double] =
     encode(N, h, (i: Int, F: Map[Int, Double]) => F.getOrElse(i, 0.0) + 1.0)(xs)
 
+  def freq[A](dict: Map[A, Int])(xs: Array[A]): SparseVector[Double] =
+    encode.freq(dict.size, dict.apply)(xs) // TODO does not work without target
+
   def bin[A](N: Int = card, h: A => Int = native)(xs: Array[A]): SparseVector[Double] =
     encode(N, h, (_: Int, _: Map[Int, Double]) => 1.0)(xs)
+
+  def bin[A](dict: Map[A, Int])(xs: Array[A]): SparseVector[Double] =
+    encode.bin(dict.size, dict.apply)(xs) // TODO does not work without target
+
+  def dict[A](xs: DataBag[A]): Map[A, Int] =
+    xs.distinct.collect().zipWithIndex[A, Map[A, Int]](breakOut)
 
   def apply[A](
     N: Int = card,
     h: A => Int = native,
     u: (Int, Map[Int, Double]) => Double
   )(xs: Array[A]): SparseVector[Double] = {
-    var freqs = Map.empty[Int, Double]
+    var F = Map.empty[Int, Double] // frequencies map
+    val I = index(N, h) _
 
     val L = xs.length
     var i = 0
     while (i < L) {
       val x = xs(i)
-      val y = util.nonNegativeMod(h(x), N)
-      freqs += y -> u(y, freqs)
+      val y = I(x)
+      F += y -> u(y, F)
       i += 1
     }
 
     val builder = new VectorBuilder[Double](N)
-    for ((k, v) <- freqs) builder.add(k, v)
-    val rs = builder.toSparseVector(false, true)
-    rs
+    for ((k, v) <- F) builder.add(k, v)
+    builder.toSparseVector(false, true)
   }
+
+  def index[A](dict: Map[A, Int])(x: A): Int =
+    encode.index(dict.size, dict.apply)(x) // TODO does not work without target
+
+  def index[A](N: Int, h: A => Int)(x: A): Int =
+    util.nonNegativeMod(h(x), N)
 }
