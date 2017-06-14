@@ -21,39 +21,78 @@ import lib.ml._
 import lib.ml.util
 
 import breeze.linalg._
+import org.scalactic._
+
+import collection.Map
 
 class EncodeSpec extends FeatureSpec {
 
-  it should "hash freq" in {
-    val exp = hashes(false)
+  implicit object SeqSPointIntEquality extends Equality[Seq[SPoint[Int]]] {
+
+    def areEqual(lhs: Seq[SPoint[Int]], rhs: Any) = rhs match {
+      case rhs: Seq[SPoint[Int]@unchecked] => {
+        lhs.map(_.id) === rhs.map(_.id)
+      } && (lhs.map(_.pos) zip rhs.map(_.pos)).forall({
+        case (v, w) => v.size === w.size &&
+          v.dat.toList === w.dat.toList &&
+          v.idx.toList === w.idx.toList
+      })
+      case _ => false
+    }
+  }
+
+  it should "encode frequencies with a hash function" in {
+    val exp = expHash(false)
     val act = freq(tokenss.zipWithIndex)
-    act.map(_.id) shouldEqual exp.map(_.id)
-    for ((v, w) <- act.map(_.pos) zip exp.map(_.pos)) {
-      v.dat.toList shouldEqual w.dat.toList
-      v.idx.toList shouldEqual w.idx.toList
-      v.size shouldEqual w.size
-    }
+    act.shouldEqual(exp)(SeqSPointIntEquality)
   }
 
-  it should "hash bin" in {
-    val exp = hashes(true)
+  it should "encode frequencies with a dictionary" in {
+    val dic = dict(tokenss)
+    val exp = expDict(dic, false)
+    val act = freq(dic, tokenss.zipWithIndex)
+    act shouldEqual exp
+  }
+
+  it should "encode binary with a hash function" in {
+    val exp = expHash(true)
     val act = bin(tokenss.zipWithIndex)
-    act.map(_.id) shouldEqual exp.map(_.id)
-    for ((v, w) <- act.map(_.pos) zip exp.map(_.pos)) {
-      v.dat.toList shouldEqual w.dat.toList
-      v.idx.toList shouldEqual w.idx.toList
-      v.size shouldEqual w.size
-    }
+    act shouldEqual exp
   }
 
-  protected final def hashes(bin: Boolean) = for {
-    (tokens, id) <- tokenss.zipWithIndex
+  it should "encode binary with a dictionary" in {
+    val dic = dict(tokenss)
+    val exp = expDict(dic, true)
+    val act = bin(dic, tokenss.zipWithIndex)
+    act shouldEqual exp
+  }
+
+  protected final def expHash(bin: Boolean) = for {
+    (tokens, id) <- tokenss.zipWithIndex.toSeq
   } yield {
     val kx = (x: String) => util.nonNegativeMod(encode.native(x), encode.card)
     val rs = tokens.groupBy(kx).mapValues(_.length)
     val vb = new VectorBuilder[Double](encode.card)
     rs.foreach({ case (k, v) => vb.add(k, if (bin) 1.0 else v) })
     SPoint(id, vb.toSparseVector())
+  }
+
+  protected final def expDict(dict: Map[String, Int], bin: Boolean) = for {
+    (tokens, id) <- tokenss.zipWithIndex.toSeq
+  } yield {
+    val kx = (x: String) => util.nonNegativeMod(dict(x), dict.size)
+    val rs = tokens.groupBy(kx).mapValues(_.length)
+    val vb = new VectorBuilder[Double](dict.size)
+    rs.foreach({ case (k, v) => vb.add(k, if (bin) 1.0 else v) })
+    SPoint(id, vb.toSparseVector())
+  }
+
+  protected def dict(xs: Seq[Array[String]]): Map[String, Int] = {
+    val fs = for {
+      x <- DataBag(xs)
+      f <- DataBag(x)
+    } yield f
+    encode.dict(fs)
   }
 
   protected def freq(xs: Seq[(Array[String], Int)]) = {
@@ -63,10 +102,24 @@ class EncodeSpec extends FeatureSpec {
     rs.collect()
   }
 
+  protected def freq(dict: Map[String, Int], xs: Seq[(Array[String], Int)]) = {
+    val rs = for {
+      (tokens, id) <- DataBag(xs)
+    } yield SPoint(id, encode.freq[String](dict)(tokens))
+    rs.collect()
+  }
+
   protected def bin(xs: Seq[(Array[String], Int)]) = {
     val rs = for {
       (tokens, id) <- DataBag(xs)
     } yield SPoint(id, encode.bin[String]()(tokens))
+    rs.collect()
+  }
+
+  protected def bin(dict: Map[String, Int], xs: Seq[(Array[String], Int)]) = {
+    val rs = for {
+      (tokens, id) <- DataBag(xs)
+    } yield SPoint(id, encode.bin[String](dict)(tokens))
     rs.collect()
   }
 }

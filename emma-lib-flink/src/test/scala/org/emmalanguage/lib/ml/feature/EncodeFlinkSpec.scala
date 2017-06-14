@@ -36,4 +36,24 @@ class EncodeFlinkSpec extends EncodeSpec with FlinkAware {
       } yield SPoint(id, encode.bin[String]()(tokens))
       rs.collect()
     })
+
+  override protected def freq(
+    dict: collection.Map[String, Int],
+    xs: Seq[(Array[String], Int)]) =
+    withDefaultFlinkEnv(implicit flink => emma.onFlink {
+      val rs = for {
+        (tokens, id) <- DataBag(xs)
+      } yield SPoint(id, encode.freq[String](dict)(tokens))
+      rs.collect()
+    })
+
+  override protected def bin(
+    dict: collection.Map[String, Int],
+    xs: Seq[(Array[String], Int)]) =
+    withDefaultFlinkEnv(implicit flink => emma.onFlink{
+      val rs = for {
+        (tokens, id) <- DataBag(xs)
+      } yield SPoint(id, encode.bin[String](dict)(tokens))
+      rs.collect()
+    })
 }
