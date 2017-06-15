@@ -95,6 +95,7 @@ This project depends on the following libraries:
   emma-flink under The Apache License, Version 2.0
   emma-language under The Apache License, Version 2.0
   emma-lib under The Apache License, Version 2.0
+  emma-lib-dummy under The Apache License, Version 2.0
   emma-lib-flink under The Apache License, Version 2.0
   emma-lib-parent under The Apache License, Version 2.0
   emma-lib-spark under The Apache License, Version 2.0
