@@ -25,7 +25,10 @@ object kfold {
   case class Assigned[A](foldID: Int, entry: A)
 
   /** Assign each entry in `xs` to `split` in the [0, K) range with probability equal to the given `pdf`. */
-  def split[A: Meta](pdf: Seq[Double])(xs: DataBag[A])(seed: Long = 631431513L): DataBag[Assigned[A]] = {
+  def split[A: Meta](fractions: Seq[Double])(xs: DataBag[A])(seed: Long = 631431513L): DataBag[Assigned[A]] = {
+    // normalize fractions
+    val fsum = fractions.sum
+    val pdf = fractions.map(x => x / fsum)
     assert(pdf.sum == 1.0, "Fractions should add up to 1")
     assert(pdf.forall(x => x > 0 && x < 1.0), "Fractions should be in the (0, 1) range.")
 

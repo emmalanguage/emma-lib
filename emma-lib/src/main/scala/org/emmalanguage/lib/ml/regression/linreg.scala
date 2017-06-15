@@ -14,26 +14,28 @@
  * limitations under the License.
  */
 package org.emmalanguage
-package lib.ml.clustering
+package lib.ml.regression
 
 import api.Meta.Projections._
 import api._
 import lib.linalg._
 import lib.ml._
-import lib.linalg._
+import lib.ml.optimization.error.Error
 
-class KMeansFlinkSpec extends KMeansSpec with FlinkAware {
+@emma.lib
+object linreg {
+  type Instance[ID] = LDPoint[ID, Double]
+  type Solver[ID] = DataBag[Instance[ID]] => LinearModel
 
-  override def run(k: Int, epsilon: Double, iterations: Int, input: String): Set[kMeans.Solution[Long]] =
-    withDefaultFlinkEnv(implicit flink => emma.onFlink {
-      // read the input
-      val points = for (line <- DataBag.readText(input)) yield {
-        val record = line.split("\t")
-        DPoint(record.head.toLong, dense(record.tail.map(_.toDouble)))
-      }
-      // do the clustering
-      val result = kMeans(2, k, epsilon, iterations)(points)
-      // return the solution as a local set
-      result.collect().toSet[kMeans.Solution[Long]]
-    })
+  def train[ID: Meta](instances: DataBag[Instance[ID]], solve: Solver[ID]): LinearModel =
+    solve(prependBias(instances))
+
+  def predict[ID: Meta](
+    weights: DVector, err: Error
+  )(
+    instances: DataBag[Instance[ID]]
+  ): Double = err(weights, prependBias(instances))
+
+  def prependBias[ID: Meta](instances: DataBag[Instance[ID]]): DataBag[Instance[ID]] =
+    instances.map(x => x.copy(pos = dense(1.0 +: x.pos.values)))
 }

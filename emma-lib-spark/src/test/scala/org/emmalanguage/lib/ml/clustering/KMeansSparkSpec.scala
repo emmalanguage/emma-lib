@@ -20,6 +20,7 @@ import api.Meta.Projections._
 import api._
 import lib.linalg._
 import lib.ml._
+import lib.linalg._
 
 class KMeansSparkSpec extends KMeansSpec with SparkAware {
 
