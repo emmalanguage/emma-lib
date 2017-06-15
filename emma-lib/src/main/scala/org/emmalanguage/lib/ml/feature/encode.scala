@@ -18,8 +18,7 @@ package lib.ml.feature
 
 import api._
 import lib.ml.util
-
-import breeze.linalg._
+import lib.ml.linalg._
 
 import collection.Map
 import scala.collection.breakOut
@@ -31,16 +30,16 @@ object encode {
 
   val native = (x: Any) => x.hashCode()
 
-  def freq[A](N: Int = card, h: A => Int = native)(xs: Array[A]): SparseVector[Double] =
+  def freq[A](N: Int = card, h: A => Int = native)(xs: Array[A]): SVector =
     encode(N, h, (i: Int, F: Map[Int, Double]) => F.getOrElse(i, 0.0) + 1.0)(xs)
 
-  def freq[A](dict: Map[A, Int])(xs: Array[A]): SparseVector[Double] =
+  def freq[A](dict: Map[A, Int])(xs: Array[A]): SVector =
     encode.freq(dict.size, dict.apply)(xs) // TODO does not work without target
 
-  def bin[A](N: Int = card, h: A => Int = native)(xs: Array[A]): SparseVector[Double] =
+  def bin[A](N: Int = card, h: A => Int = native)(xs: Array[A]): SVector =
     encode(N, h, (_: Int, _: Map[Int, Double]) => 1.0)(xs)
 
-  def bin[A](dict: Map[A, Int])(xs: Array[A]): SparseVector[Double] =
+  def bin[A](dict: Map[A, Int])(xs: Array[A]): SVector =
     encode.bin(dict.size, dict.apply)(xs) // TODO does not work without target
 
   def dict[A](xs: DataBag[A]): Map[A, Int] =
@@ -50,7 +49,7 @@ object encode {
     N: Int = card,
     h: A => Int = native,
     u: (Int, Map[Int, Double]) => Double
-  )(xs: Array[A]): SparseVector[Double] = {
+  )(xs: Array[A]): SVector = {
     var F = Map.empty[Int, Double] // frequencies map
     val I = index(N, h) _
 
@@ -63,9 +62,7 @@ object encode {
       i += 1
     }
 
-    val builder = new VectorBuilder[Double](N)
-    for ((k, v) <- F) builder.add(k, v)
-    builder.toSparseVector(false, true)
+    sparse(N, F.toSeq)
   }
 
   def index[A](dict: Map[A, Int])(x: A): Int =

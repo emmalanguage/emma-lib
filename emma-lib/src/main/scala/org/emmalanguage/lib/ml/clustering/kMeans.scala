@@ -19,8 +19,7 @@ package lib.ml.clustering
 import api.Meta.Projections._
 import api._
 import lib.ml._
-
-import breeze.linalg._
+import lib.ml.linalg._
 
 @emma.lib
 object kMeans {
@@ -32,12 +31,12 @@ object kMeans {
   ): DataBag[Solution[PID]] = {
     // helper method: orders points `x` based on their distance to `pos`
     val distanceTo = (pos: DVector) => Ordering.by { x: DPoint[PID] =>
-      squaredDistance(DVector.to(pos), DVector.to(x.pos))
+      sqdist(pos, x.pos)
     }
 
     // helper fold algebra: sum positions of labeled (solution) points
-    val Sum = alg.Fold[Solution[PID], DenseVector[Double]](
-      z = DenseVector.zeros[Double](D),
+    val Sum = alg.Fold[Solution[PID], DVector](
+      z = zeros(D),
       i = x => x.pos,
       p = _ + _
     )
@@ -65,7 +64,8 @@ object kMeans {
         } yield {
           val sum = ps.fold(Sum)
           val cnt = ps.size.toDouble
-          DPoint(cid, sum / cnt)
+          val avg = sum * (1 / cnt)
+          DPoint(cid, avg)
         }
 
         // update delta as the sum of squared distances between the old and the new means
@@ -73,14 +73,14 @@ object kMeans {
           cOld <- ctrds
           cNew <- newCtrds
           if cOld.id == cNew.id
-        } yield squaredDistance(DVector.to(cOld.pos), DVector.to(cNew.pos))).sum
+        } yield sqdist(cOld.pos, cNew.pos)).sum
 
         // use new means for the next iteration
         ctrds = newCtrds
       } while (delta > epsilon)
 
       val sumSqrDist = (for (p <- solution) yield {
-        squaredDistance(DVector.to(p.label.pos), DVector.to(p.pos))
+        sqdist(p.label.pos, p.pos)
       }).sum
 
       if (i <= 1 || sumSqrDist < minSqrDist) {

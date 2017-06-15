@@ -34,8 +34,8 @@
         <scalastyle-maven-plugin.skip>false</scalastyle-maven-plugin.skip>
         <scalatest-maven-plugin.skip>${skipTests}</scalatest-maven-plugin.skip>
 
-        <!-- Breeze -->
-        <breeze.version>0.12</breeze.version>
+        <!-- ML -->
+        <netlib.version>1.1</netlib.version>
     </properties>
 
     <dependencies>
@@ -67,11 +67,11 @@
             <artifactId>scopt_${scala.tools.version}</artifactId>
         </dependency>
 
-        <!-- Breeze -->
+        <!-- ML -->
         <dependency>
-            <groupId>org.scalanlp</groupId>
-            <artifactId>breeze_${scala.tools.version}</artifactId>
-            <version>${breeze.version}</version>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-mllib-local_${scala.tools.version}</artifactId>
+            <version>${spark.version}</version>
         </dependency>
     </dependencies>
 

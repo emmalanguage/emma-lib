@@ -74,7 +74,7 @@ class KMeansSpec extends BaseLibSpec {
     // read the input
     val points = for (line <- DataBag.readText(input)) yield {
       val record = line.split("\t")
-      DPoint(record.head.toLong, DVector(record.tail.map(_.toDouble)))
+      DPoint(record.head.toLong, linalg.dense(record.tail.map(_.toDouble)))
     }
     // do the clustering
     val result = kMeans(2, k, epsilon, iterations)(points)

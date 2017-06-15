@@ -20,7 +20,6 @@ import api._
 import lib.ml._
 import lib.ml.util
 
-import breeze.linalg._
 import org.scalactic._
 
 import collection.Map
@@ -34,8 +33,8 @@ class EncodeSpec extends FeatureSpec {
         lhs.map(_.id) === rhs.map(_.id)
       } && (lhs.map(_.pos) zip rhs.map(_.pos)).forall({
         case (v, w) => v.size === w.size &&
-          v.dat.toList === w.dat.toList &&
-          v.idx.toList === w.idx.toList
+          v.values.toList === w.values.toList &&
+          v.indices.toList === w.indices.toList
       })
       case _ => false
     }
@@ -71,20 +70,16 @@ class EncodeSpec extends FeatureSpec {
     (tokens, id) <- tokenss.zipWithIndex.toSeq
   } yield {
     val kx = (x: String) => util.nonNegativeMod(encode.native(x), encode.card)
-    val rs = tokens.groupBy(kx).mapValues(_.length)
-    val vb = new VectorBuilder[Double](encode.card)
-    rs.foreach({ case (k, v) => vb.add(k, if (bin) 1.0 else v) })
-    SPoint(id, vb.toSparseVector())
+    val rs = tokens.groupBy(kx).mapValues(vs => if (bin) 1.0 else vs.length)
+    SPoint(id, linalg.sparse(encode.card, rs.toSeq))
   }
 
   protected final def expDict(dict: Map[String, Int], bin: Boolean) = for {
     (tokens, id) <- tokenss.zipWithIndex.toSeq
   } yield {
     val kx = (x: String) => util.nonNegativeMod(dict(x), dict.size)
-    val rs = tokens.groupBy(kx).mapValues(_.length)
-    val vb = new VectorBuilder[Double](dict.size)
-    rs.foreach({ case (k, v) => vb.add(k, if (bin) 1.0 else v) })
-    SPoint(id, vb.toSparseVector())
+    val rs = tokens.groupBy(kx).mapValues(vs => if (bin) 1.0 else vs.length)
+    SPoint(id, linalg.sparse(dict.size, rs.toSeq))
   }
 
   protected def dict(xs: Seq[Array[String]]): Map[String, Int] = {

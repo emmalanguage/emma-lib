@@ -17,37 +17,7 @@ package org.emmalanguage
 package lib.ml
 
 import api._
-
-import breeze.collection.mutable.SparseArray
-import breeze.linalg._
-
-import scala.language.implicitConversions
-
-/** Library-agnostic dense vector representation. */
-case class DVector(dat: Array[Double])
-
-object DVector {
-  implicit def from(v: DenseVector[Double]): DVector =
-    if (v.offset != 0 || v.stride != 1 || v.data.length != v.length) DVector(v.toArray)
-    else DVector(v.data) // avoid Arrays.copyOfRange if possible
-
-  implicit def to(v: DVector): DenseVector[Double] =
-    DenseVector(v.dat)
-}
-
-/** Library-agnostic sparse vector representation. */
-case class SVector(idx: Array[Int], dat: Array[Double], size: Int)
-
-object SVector {
-  implicit def from(v: SparseVector[Double]): SVector = {
-    val idx = java.util.Arrays.copyOf(v.index, v.used) // TODO: consider using v.index directly
-    val dat = java.util.Arrays.copyOf(v.data, v.used) // TODO: consider using v.data directly
-    SVector(idx, dat, v.array.size)
-  }
-
-  implicit def to(v: SVector): SparseVector[Double] =
-    new SparseVector(new SparseArray(v.idx, v.dat, v.dat.length, v.size, 0.0))
-}
+import linalg._
 
 /** Point with identity and a dense vector position. */
 case class DPoint[ID](@emma.pk id: ID, pos: DVector)
