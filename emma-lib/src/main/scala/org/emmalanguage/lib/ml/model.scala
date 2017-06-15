@@ -31,5 +31,13 @@ case class LDPoint[ID, L](@emma.pk id: ID, pos: DVector, label: L)
 /** Point with identity, a dense vector position, and a label. */
 case class LSPoint[ID, L](@emma.pk id: ID, pos: SVector, label: L)
 
+/** Point with identity, weight, dense vector position, and label */
+case class WLDPoint[ID, L](@emma.pk id: ID, w: Double, pos: DVector, label: L)
+
+/** Point with identity, weight, sparse vector position, and label */
+case class WLSPoint[ID, L](@emma.pk id: ID, w: Double, pos: SVector, label: L)
+
 /** Features point. */
 case class FPoint[ID, F](@emma.pk id: ID, features: F)
+
+case class LinearModel(weights: DVector, lossHistory: Array[Double] = Array.empty)

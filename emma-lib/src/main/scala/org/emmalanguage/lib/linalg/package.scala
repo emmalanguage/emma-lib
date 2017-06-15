@@ -38,6 +38,9 @@ package object linalg extends MathUtil {
   def sqdist(x: Vector, y: Vector): Double =
     spark.Vectors.sqdist(x, y)
 
+  def norm(vector: Vector, p: Double): Double =
+    spark.Vectors.norm(vector, p)
+
   def sum(x: DVector): Double = x.values.sum
 
   implicit class DVectorOps(val x: DVector) extends AnyVal {
@@ -54,8 +57,57 @@ package object linalg extends MathUtil {
       }
     }
 
+    def -=(y: DVector): Unit =
+      BLAS.axpy(-1.0, y, x)
+
+    def -=(y: Double): Unit = {
+      var i = 0
+      val N = x.size
+      val r = x.values
+      while (i < N) {
+        r(i) = x(i) - y
+        i += 1
+      }
+    }
+
+    def *=(y: DVector): Unit = {
+      val xs = x.size
+      val ys = y.size
+      require(xs == ys, s"Vectors must be the same length. Was: $xs, $ys")
+      var i = 0
+      val r = x.values
+      while (i < xs) {
+        r(i) = x(i) * y(i)
+        i += 1
+      }
+    }
+
     def *=(a: Double): Unit =
       BLAS.scal(a, x)
+
+    def /=(y: Double): Unit = {
+      var i = 0
+      val N = x.size
+      val r = x.values
+      while (i < N) {
+        r(i) = x(i) / y
+        i += 1
+      }
+    }
+
+    def /=(y: DVector): Unit = {
+      val xs = x.size
+      val ys = y.size
+      require(xs == ys, s"Vectors must be the same length. Was: $xs, $ys")
+      var i = 0
+      val r = x.values
+      while (i < xs) {
+        r(i) = x(i) / y(i)
+        i += 1
+      }
+    }
+
+    // non-in-place operations
 
     def +(y: DVector): DVector = {
       val z = y.copy
@@ -74,11 +126,68 @@ package object linalg extends MathUtil {
       dense(r)
     }
 
+    def -(y: DVector): DVector = {
+      val z = x.copy
+      BLAS.axpy(-1.0, y, z)
+      z
+    }
+
+    def -(y: Double): DVector = {
+      var i = 0
+      val N = x.size
+      val r = Array.ofDim[Double](N)
+      while (i < N) {
+        r(i) = x(i) - y
+        i += 1
+      }
+      dense(r)
+    }
+
+    def *(y: DVector): DVector = {
+      val xs = x.size
+      val ys = y.size
+      require(xs == ys, s"Vectors must be the same length. Was: $xs, $ys")
+      var i = 0
+      val r = Array.ofDim[Double](xs)
+      while (i < xs) {
+        r(i) = x(i) * y(i)
+        i += 1
+      }
+      dense(r)
+    }
+
     def *(a: Double): DVector = {
       val y = x.copy
       BLAS.scal(a, y)
       y
     }
+
+    def /(y: DVector): DVector = {
+      val xs = x.size
+      val ys = y.size
+      require(xs == ys, s"Vectors must be the same length. Was: $xs, $ys")
+      var i = 0
+      val r = Array.ofDim[Double](xs)
+      while (i < xs) {
+        r(i) = x(i) / y(i)
+        i += 1
+      }
+      dense(r)
+    }
+
+    def /(y: Double): DVector = {
+      var i = 0
+      val N = x.size
+      val r = Array.ofDim[Double](N)
+      while (i < N) {
+        r(i) = x(i) / y
+        i += 1
+      }
+      dense(r)
+    }
+
+    def dot(y: DVector): Double =
+      BLAS.dot(x, y)
 
     def max(y: DVector): DVector = {
       var i = 0
