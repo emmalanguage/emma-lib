@@ -166,7 +166,7 @@
             <dependency>
                 <groupId>org.emmalanguage</groupId>
                 <artifactId>emma-lib</artifactId>
-                <version>0.2-rc2</version>
+                <version>${project.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
