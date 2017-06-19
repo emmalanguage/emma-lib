@@ -39,20 +39,37 @@ package object linalg extends MathUtil {
     spark.Vectors.sqdist(x, y)
 
   implicit class DVectorOps(val x: DVector) extends AnyVal {
-    def +=(y: DVector): DVector = {
+    def +=(y: DVector): Unit =
       BLAS.axpy(1.0, y, x)
-      x
+
+    def +=(y: Double): Unit = {
+      var i = 0
+      val N = x.size
+      val r = x.values
+      while (i < N) {
+        r(i) = x(i) + y
+        i += 1
+      }
     }
 
-    def *=(a: Double): DVector = {
+    def *=(a: Double): Unit =
       BLAS.scal(a, x)
-      x
-    }
 
     def +(y: DVector): DVector = {
       val z = y.copy
       BLAS.axpy(1.0, x, z)
       z
+    }
+
+    def +(y: Double): DVector = {
+      var i = 0
+      val N = x.size
+      val r = Array.ofDim[Double](N)
+      while (i < N) {
+        r(i) = x(i) + y
+        i += 1
+      }
+      dense(r)
     }
 
     def *(a: Double): DVector = {
