@@ -60,6 +60,28 @@ package object linalg {
       BLAS.scal(a, y)
       y
     }
+
+    def max(y: DVector): DVector = {
+      var i = 0
+      val N = x.size
+      val r = Array.ofDim[Double](N)
+      while (i < N) {
+        r(i) = Math.max(x(i), y(i))
+        i += 1
+      }
+      dense(r)
+    }
+
+    def min(y: DVector): DVector = {
+      var i = 0
+      val N = x.size
+      val r = Array.ofDim[Double](N)
+      while (i < N) {
+        r(i) = Math.min(x(i), y(i))
+        i += 1
+      }
+      dense(r)
+    }
   }
 
 }
