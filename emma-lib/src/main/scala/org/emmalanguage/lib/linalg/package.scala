@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 package org.emmalanguage
-package lib.ml
+package lib
 
 import org.apache.spark.ml.{linalg => spark}
 

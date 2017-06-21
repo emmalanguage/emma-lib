@@ -17,8 +17,8 @@ package org.emmalanguage
 package lib.ml.feature
 
 import api._
+import lib.linalg._
 import lib.ml._
-import lib.ml.util
 
 import org.scalactic._
 
@@ -71,7 +71,7 @@ class EncodeSpec extends FeatureSpec {
   } yield {
     val kx = (x: String) => util.nonNegativeMod(encode.native(x), encode.card)
     val rs = tokens.groupBy(kx).mapValues(vs => if (bin) 1.0 else vs.length)
-    SPoint(id, linalg.sparse(encode.card, rs.toSeq))
+    SPoint(id, sparse(encode.card, rs.toSeq))
   }
 
   protected final def expDict(dict: Map[String, Int], bin: Boolean) = for {
@@ -79,7 +79,7 @@ class EncodeSpec extends FeatureSpec {
   } yield {
     val kx = (x: String) => util.nonNegativeMod(dict(x), dict.size)
     val rs = tokens.groupBy(kx).mapValues(vs => if (bin) 1.0 else vs.length)
-    SPoint(id, linalg.sparse(dict.size, rs.toSeq))
+    SPoint(id, sparse(dict.size, rs.toSeq))
   }
 
   protected def dict(xs: Seq[Array[String]]): Map[String, Int] = {

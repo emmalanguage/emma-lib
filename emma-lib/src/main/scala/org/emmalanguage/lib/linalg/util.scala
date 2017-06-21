@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 package org.emmalanguage
-package lib.ml
+package lib.linalg
 
 object util {
-  /* Calculates 'x' modulo 'mod', takes to consideration sign of x,
-   * i.e. if 'x' is negative, than 'x' % 'mod' is negative too
-   * so function return (x % mod) + mod in that case.
+  /**
+   * Calculates 'x' modulo 'mod', takes to consideration sign of x,
+   * i.e. if 'x' is negative, than 'x' % 'mod' is negative too so
+   * function return (x % mod) + mod in that case.
    */
   def nonNegativeMod(x: Int, mod: Int): Int = {
     val rawMod = x % mod

@@ -18,14 +18,13 @@ package lib.ml.clustering
 
 import api.Meta.Projections._
 import api._
-import kMeans.Solution
-import lib.BaseLibSpec
+import lib.linalg._
 import lib.ml._
 import test.util._
 
 import scala.io.Source
 
-class KMeansSpec extends BaseLibSpec {
+class KMeansSpec extends lib.BaseLibSpec {
 
   val epsilon = 1e-3
   val iterations = 10
@@ -70,15 +69,15 @@ class KMeansSpec extends BaseLibSpec {
     for ((_, values) <- associations.groupBy { case (p, c) => c })
       yield values.map { case (p, c) => p }
 
-  def run(k: Int, epsilon: Double, iterations: Int, input: String): Set[Solution[Long]] = {
+  def run(k: Int, epsilon: Double, iterations: Int, input: String): Set[kMeans.Solution[Long]] = {
     // read the input
     val points = for (line <- DataBag.readText(input)) yield {
       val record = line.split("\t")
-      DPoint(record.head.toLong, linalg.dense(record.tail.map(_.toDouble)))
+      DPoint(record.head.toLong, dense(record.tail.map(_.toDouble)))
     }
     // do the clustering
     val result = kMeans(2, k, epsilon, iterations)(points)
     // return the solution as a local set
-    result.collect().toSet[Solution[Long]]
+    result.collect().toSet[kMeans.Solution[Long]]
   }
 }

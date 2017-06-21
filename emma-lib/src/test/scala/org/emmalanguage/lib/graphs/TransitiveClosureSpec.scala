@@ -17,7 +17,6 @@ package org.emmalanguage
 package lib.graphs
 
 import api._
-import lib.BaseLibSpec
 import test.util._
 
 import resource._
@@ -25,7 +24,7 @@ import resource._
 import java.io.File
 import java.io.PrintWriter
 
-trait TransitiveClosureSpec extends BaseLibSpec {
+trait TransitiveClosureSpec extends lib.BaseLibSpec {
 
   val path = "/graphs/trans-closure"
   val temp = tempPath(path)

@@ -18,8 +18,8 @@ package lib.ml.clustering
 
 import api.Meta.Projections._
 import api._
+import lib.linalg._
 import lib.ml._
-import lib.ml.linalg._
 
 @emma.lib
 object kMeans {

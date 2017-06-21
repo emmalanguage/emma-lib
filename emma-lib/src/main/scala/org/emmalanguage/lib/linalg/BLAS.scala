@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 package org.emmalanguage
-package lib.ml.linalg
+package lib.linalg
 
 import com.github.fommil.netlib.BLAS.{getInstance => NativeBLAS}
 import com.github.fommil.netlib.F2jBLAS

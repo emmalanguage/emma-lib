@@ -17,7 +17,7 @@ package org.emmalanguage
 package lib.ml
 
 import api._
-import linalg._
+import lib.linalg._
 
 /** Point with identity and a dense vector position. */
 case class DPoint[ID](@emma.pk id: ID, pos: DVector)

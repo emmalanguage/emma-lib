@@ -16,9 +16,7 @@
 package org.emmalanguage
 package lib.ml.feature
 
-import lib.BaseLibSpec
-
-trait FeatureSpec extends BaseLibSpec {
+trait FeatureSpec extends lib.BaseLibSpec {
 
   val texts = Array(
     s"""

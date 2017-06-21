@@ -17,8 +17,7 @@ package org.emmalanguage
 package lib.ml.feature
 
 import api._
-import lib.ml.util
-import lib.ml.linalg._
+import lib.linalg._
 
 import collection.Map
 import scala.collection.breakOut
