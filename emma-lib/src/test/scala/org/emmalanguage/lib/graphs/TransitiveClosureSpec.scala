@@ -17,6 +17,7 @@ package org.emmalanguage
 package lib.graphs
 
 import api._
+import lib.linalg._
 import test.util._
 
 import resource._
@@ -74,17 +75,4 @@ trait TransitiveClosureSpec extends lib.BaseLibSpec {
       e <- Seq(Edge(w, x), Edge(x, y), Edge(y, z), Edge(w, y), Edge(x, z), Edge(w, z))
     } yield e
   }.toSet
-
-  private def shuffle(n: Int)(r: util.RanHash): Array[Int] = {
-    val xs = (1 to n).toArray
-    for {
-      i <- 0 to (n - 2)
-    } {
-      val j = r.nextInt(i + 1)
-      val t = xs(i)
-      xs(i) = xs(j)
-      xs(j) = t
-    }
-    xs
-  }
 }

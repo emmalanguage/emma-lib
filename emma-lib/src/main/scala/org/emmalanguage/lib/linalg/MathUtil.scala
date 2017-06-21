@@ -26,4 +26,18 @@ private[linalg] trait MathUtil {
     val rawMod = x % mod
     rawMod + (if (rawMod < 0) mod else 0)
   }
+
+  /** Firscher-Yates shuffle. */
+  def shuffle(n: Int)(r: util.RanHash): Array[Int] = {
+    val xs = (1 to n).toArray
+    for {
+      i <- 0 to (n - 2)
+    } {
+      val j = r.nextInt(i + 1)
+      val t = xs(i)
+      xs(i) = xs(j)
+      xs(j) = t
+    }
+    xs
+  }
 }
