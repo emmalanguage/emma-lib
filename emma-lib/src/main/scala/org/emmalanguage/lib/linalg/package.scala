@@ -38,6 +38,8 @@ package object linalg extends MathUtil {
   def sqdist(x: Vector, y: Vector): Double =
     spark.Vectors.sqdist(x, y)
 
+  def sum(x: DVector): Double = x.values.sum
+
   implicit class DVectorOps(val x: DVector) extends AnyVal {
     def +=(y: DVector): Unit =
       BLAS.axpy(1.0, y, x)
