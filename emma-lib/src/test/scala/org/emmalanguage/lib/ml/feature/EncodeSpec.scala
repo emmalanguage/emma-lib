@@ -69,7 +69,7 @@ class EncodeSpec extends FeatureSpec {
   protected final def expHash(bin: Boolean) = for {
     (tokens, id) <- tokenss.zipWithIndex.toSeq
   } yield {
-    val kx = (x: String) => util.nonNegativeMod(encode.native(x), encode.card)
+    val kx = (x: String) => nonNegativeMod(encode.native(x), encode.card)
     val rs = tokens.groupBy(kx).mapValues(vs => if (bin) 1.0 else vs.length)
     SPoint(id, sparse(encode.card, rs.toSeq))
   }
@@ -77,7 +77,7 @@ class EncodeSpec extends FeatureSpec {
   protected final def expDict(dict: Map[String, Int], bin: Boolean) = for {
     (tokens, id) <- tokenss.zipWithIndex.toSeq
   } yield {
-    val kx = (x: String) => util.nonNegativeMod(dict(x), dict.size)
+    val kx = (x: String) => nonNegativeMod(dict(x), dict.size)
     val rs = tokens.groupBy(kx).mapValues(vs => if (bin) 1.0 else vs.length)
     SPoint(id, sparse(dict.size, rs.toSeq))
   }

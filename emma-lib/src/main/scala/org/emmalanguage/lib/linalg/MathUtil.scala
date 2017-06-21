@@ -16,7 +16,7 @@
 package org.emmalanguage
 package lib.linalg
 
-object util {
+private[linalg] trait MathUtil {
   /**
    * Calculates 'x' modulo 'mod', takes to consideration sign of x,
    * i.e. if 'x' is negative, than 'x' % 'mod' is negative too so

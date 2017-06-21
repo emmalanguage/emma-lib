@@ -68,5 +68,5 @@ object encode {
     encode.index(dict.size, dict.apply)(x) // TODO does not work without target
 
   def index[A](N: Int, h: A => Int)(x: A): Int =
-    util.nonNegativeMod(h(x), N)
+    nonNegativeMod(h(x), N)
 }

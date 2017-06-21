@@ -18,7 +18,7 @@ package lib
 
 import org.apache.spark.ml.{linalg => spark}
 
-package object linalg {
+package object linalg extends MathUtil {
   type Vector = spark.Vector
   type DVector = spark.DenseVector
   type SVector = spark.SparseVector
