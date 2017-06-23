@@ -20,6 +20,7 @@ import api.Meta.Projections._
 import api._
 import lib.linalg._
 import lib.ml._
+import lib.stats._
 
 @emma.lib
 object kMeans {
@@ -33,13 +34,6 @@ object kMeans {
     val distanceTo = (pos: DVector) => Ordering.by { x: DPoint[PID] =>
       sqdist(pos, x.pos)
     }
-
-    // helper fold algebra: sum positions of labeled (solution) points
-    val Sum = alg.Fold[Solution[PID], DVector](
-      z = zeros(D),
-      i = x => x.pos,
-      p = _ + _
-    )
 
     var optSolution = DataBag.empty[Solution[PID]]
     var minSqrDist = 0.0
@@ -62,7 +56,7 @@ object kMeans {
         val newCtrds = for {
           Group(cid, ps) <- solution.groupBy(_.label.id)
         } yield {
-          val sum = ps.fold(Sum)
+          val sum = stat.sum(D)(ps.map(_.pos))
           val cnt = ps.size.toDouble
           val avg = sum * (1 / cnt)
           DPoint(cid, avg)
