@@ -21,21 +21,18 @@ import api._
 import lib.linalg._
 
 class EvaluateSparkSpec extends EvaluateSpec with SparkAware {
-  override def precision(h: DVector => Boolean, seq: Seq[Point]) = {
+  override def precision(h: DVector => Boolean, seq: Seq[Point]) =
     withDefaultSparkSession(implicit spark => emma.onSpark {
       evaluate.precision(h)(testBag(seq))
     })
-  }
 
-  override def recall(h: DVector => Boolean, seq: Seq[Point]) = {
+  override def recall(h: DVector => Boolean, seq: Seq[Point]) =
     withDefaultSparkSession(implicit spark => emma.onSpark {
       evaluate.recall(h)(testBag(seq))
     })
-  }
 
-  override def f1score(h: DVector => Boolean, seq: Seq[Point]) = {
+  override def f1score(h: DVector => Boolean, seq: Seq[Point]) =
     withDefaultSparkSession(implicit spark => emma.onSpark {
       evaluate.f1score(h)(testBag(seq))
     })
-  }
 }
