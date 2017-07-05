@@ -17,83 +17,91 @@ package org.emmalanguage
 package lib.ml.classification
 
 import api._
-import lib.ml._
 import lib.linalg._
-import evaluate._
+import lib.ml._
 
+/**
+ * Test data is randomly distributed in the unit square.
+ * Test labels are actually computed as `y >= 0.5`,
+ * while the hypotesis predicts labels as `x <= 0.5`.
+ * This leads to the following 4 quadrants around the `(0.5,0.5)` center point:
+ *
+ * {{{
+ *  TP | FN
+ *  ---|---
+ *  FP | TN
+ * }}}
+ */
 class EvaluateSpec extends lib.BaseLibSpec {
-  type Point = (Double, Double)
-  val tolerance = 1e-3
-  val h: DVector => Boolean = _.values.head >= 0.0
+  /** Labeled point type. */
+  type Point = LDPoint[Int, Boolean]
 
-  /*
-   *  TP | FP
-   *  ---|---
-   *  FN | TN
-   */
-  def randomValue = math.signum(scala.util.Random.nextDouble() - 0.5)
-
-  val testSet: Seq[Point] = for {
-    _ <- 1 to 1000
-  } yield (randomValue, randomValue)
-
-  protected def testBag(testSet: Seq[Point]) = {
-    val xs = testSet.map {
-      case (x, y) =>
-        LDPoint(
-          "id",
-          dense(Array(y)),
-          x < 0.0
-        )
-    }
-    DataBag(xs)
+  /** Comparison tolerance. */
+  val e = 1e-3 // double tolerance
+  /** Hypothesis */
+  val h = (pos: DVector) => pos(0) <= 0.5
+  /** Number of points. */
+  val N = 1000
+  /** Random Seed. */
+  val S = 35351343215L
+  /* Labeled test points in [-1,-1]^2. */
+  val ps: Seq[LDPoint[Int, Boolean]] = for (i <- 1 to N) yield {
+    val x = util.RanHash(S, 0).at(i).next()
+    val y = util.RanHash(S, 1).at(i).next()
+    LDPoint(i, dense(Array(x, y)), y >= 0.5)
   }
 
   it should "compute precision" in {
-    val exp = testPrecision(testSet)
-    val act = precision(h, testSet)
-    act should equal (exp +- tolerance)
+    val act = actPrecision(h, ps)
+    val exp = expPrecision(ps)
+    act shouldEqual (exp +- e)
   }
 
   it should "compute recall" in {
-    val exp = testRecall(testSet)
-    val act = recall(h, testSet)
-    act should equal (exp +- tolerance)
+    val act = actRecall(h, ps)
+    val exp = expRecall(ps)
+    act shouldEqual (exp +- e)
   }
 
   it should "compute f1score" in {
-    val expPrecision = testPrecision(testSet)
-    val expRecall = testRecall(testSet)
-    val exp = 2.0 * (expPrecision * expRecall) / (expPrecision + expRecall)
-    val act = f1score(h, testSet)
-    act should equal (exp +- tolerance)
+    val act = actF1Score(h, ps)
+    val exp = expF1Score(ps)
+    act shouldEqual (exp +- e)
   }
 
-  def precision(h: DVector => Boolean, seq: Seq[Point]) =
-    evaluate.precision(h)(testBag(seq))
+  def actPrecision(h: DVector => Boolean, ps: Seq[Point]) =
+    evaluate.precision(h)(DataBag(ps))
 
-  def recall(h: DVector => Boolean, seq: Seq[Point]) =
-    evaluate.recall(h)(testBag(seq))
+  def actRecall(h: DVector => Boolean, ps: Seq[Point]) =
+    evaluate.recall(h)(DataBag(ps))
 
-  def f1score(h: DVector => Boolean, seq: Seq[Point]) =
-    evaluate.f1score(h)(testBag(seq))
+  def actF1Score(h: DVector => Boolean, ps: Seq[Point]) =
+    evaluate.f1score(h)(DataBag(ps))
 
-  private[lib] def eval(p: Point): Int = p match {
-    case (x, y) if x < 0.0 && y >= 0.0  => TP
-    case (x, y) if x >= 0.0 && y >= 0.0 => FP
-    case (x, y) if x < 0.0 && y < 0.0   => FN
-    case (x, y) if x >= 0.0 && y < 0.0  => TN
+  private def expPrecision(ps: Seq[Point]) = {
+    val tp = ps.count(quadrant(_) == evaluate.TP).toDouble
+    val fp = ps.count(quadrant(_) == evaluate.FP).toDouble
+    tp / (tp + fp)
   }
 
-  private[lib] def testPrecision(seq: Seq[Point]) = {
-    val expTp = testSet.count(eval(_) == TP).toDouble
-    val expFp = testSet.count(eval(_) == FP).toDouble
-    expTp / (expTp + expFp)
+  private def expRecall(seq: Seq[Point]) = {
+    val tp = ps.count(quadrant(_) == evaluate.TP).toDouble
+    val fn = ps.count(quadrant(_) == evaluate.FN).toDouble
+    tp / (tp + fn)
   }
 
-  private[lib] def testRecall(seq: Seq[Point]) = {
-    val expTp = testSet.count(eval(_) == TP).toDouble
-    val expFn = testSet.count(eval(_) == FN).toDouble
-    expTp / (expTp + expFn)
+  private def expF1Score(ps: Seq[Point]) = {
+    val p = expPrecision(ps)
+    val r = expRecall(ps)
+    2.0 * (p * r) / (p + r)
   }
+
+  private def quadrant(p: Point): Int =
+    if (p.pos(1) >= 0.5) {
+      if (p.pos(0) <= 0.5) evaluate.TP
+      else evaluate.FN
+    } else {
+      if (p.pos(0) <= 0.5) evaluate.FP
+      else evaluate.TN
+    }
 }
