@@ -22,7 +22,7 @@ import lib.linalg._
 import lib.ml._
 
 @emma.lib
-object evaluate {
+object eval {
   type Hypothesis = DVector => Boolean
   type TestBag[ID] = DataBag[LDPoint[ID, Boolean]]
 
@@ -38,14 +38,14 @@ object evaluate {
     }
 
   def precision[ID: Meta](h: Hypothesis)(xs: TestBag[ID]): Double = {
-    val es = evaluate(h)(xs)
+    val es = eval(h)(xs)
     val tp = es.count(_.label == TP).toDouble
     val fp = es.count(_.label == FP).toDouble
     tp / (tp + fp)
   }
 
   def recall[ID: Meta](h: Hypothesis)(xs: TestBag[ID]): Double = {
-    val es = evaluate(h)(xs)
+    val es = eval(h)(xs)
     val tp = es.count(_.label == TP).toDouble
     val fn = es.count(_.label == FN).toDouble
     tp / (tp + fn)

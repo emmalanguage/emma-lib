@@ -20,20 +20,20 @@ import api.Meta.Projections._
 import api._
 import lib.linalg._
 
-class EvaluateFlinkSpec extends EvaluateSpec with FlinkAware {
+class EvalFlinkSpec extends EvalSpec with FlinkAware {
 
   override def actPrecision(h: DVector => Boolean, ps: Seq[Point]) =
     withDefaultFlinkEnv(implicit flink => emma.onFlink {
-      evaluate.precision(h)(DataBag(ps))
+      eval.precision(h)(DataBag(ps))
     })
 
   override def actRecall(h: DVector => Boolean, ps: Seq[Point]) =
     withDefaultFlinkEnv(implicit flink => emma.onFlink {
-      evaluate.recall(h)(DataBag(ps))
+      eval.recall(h)(DataBag(ps))
     })
 
   override def actF1Score(h: DVector => Boolean, ps: Seq[Point]) =
     withDefaultFlinkEnv(implicit flink => emma.onFlink {
-      evaluate.f1score(h)(DataBag(ps))
+      eval.f1score(h)(DataBag(ps))
     })
 }

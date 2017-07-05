@@ -32,7 +32,7 @@ import lib.ml._
  *  FP | TN
  * }}}
  */
-class EvaluateSpec extends lib.BaseLibSpec {
+class EvalSpec extends lib.BaseLibSpec {
   /** Labeled point type. */
   type Point = LDPoint[Int, Boolean]
 
@@ -70,23 +70,23 @@ class EvaluateSpec extends lib.BaseLibSpec {
   }
 
   def actPrecision(h: DVector => Boolean, ps: Seq[Point]) =
-    evaluate.precision(h)(DataBag(ps))
+    eval.precision(h)(DataBag(ps))
 
   def actRecall(h: DVector => Boolean, ps: Seq[Point]) =
-    evaluate.recall(h)(DataBag(ps))
+    eval.recall(h)(DataBag(ps))
 
   def actF1Score(h: DVector => Boolean, ps: Seq[Point]) =
-    evaluate.f1score(h)(DataBag(ps))
+    eval.f1score(h)(DataBag(ps))
 
   private def expPrecision(ps: Seq[Point]) = {
-    val tp = ps.count(quadrant(_) == evaluate.TP).toDouble
-    val fp = ps.count(quadrant(_) == evaluate.FP).toDouble
+    val tp = ps.count(quadrant(_) == eval.TP).toDouble
+    val fp = ps.count(quadrant(_) == eval.FP).toDouble
     tp / (tp + fp)
   }
 
   private def expRecall(seq: Seq[Point]) = {
-    val tp = ps.count(quadrant(_) == evaluate.TP).toDouble
-    val fn = ps.count(quadrant(_) == evaluate.FN).toDouble
+    val tp = ps.count(quadrant(_) == eval.TP).toDouble
+    val fn = ps.count(quadrant(_) == eval.FN).toDouble
     tp / (tp + fn)
   }
 
@@ -98,10 +98,10 @@ class EvaluateSpec extends lib.BaseLibSpec {
 
   private def quadrant(p: Point): Int =
     if (p.pos(1) >= 0.5) {
-      if (p.pos(0) <= 0.5) evaluate.TP
-      else evaluate.FN
+      if (p.pos(0) <= 0.5) eval.TP
+      else eval.FN
     } else {
-      if (p.pos(0) <= 0.5) evaluate.FP
-      else evaluate.TN
+      if (p.pos(0) <= 0.5) eval.FP
+      else eval.TN
     }
 }

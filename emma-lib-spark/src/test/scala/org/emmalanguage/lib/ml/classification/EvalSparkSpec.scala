@@ -20,19 +20,19 @@ import api.Meta.Projections._
 import api._
 import lib.linalg._
 
-class EvaluateSparkSpec extends EvaluateSpec with SparkAware {
+class EvalSparkSpec extends EvalSpec with SparkAware {
   override def actPrecision(h: DVector => Boolean, ps: Seq[Point]) =
     withDefaultSparkSession(implicit spark => emma.onSpark {
-      evaluate.precision(h)(DataBag(ps))
+      eval.precision(h)(DataBag(ps))
     })
 
   override def actRecall(h: DVector => Boolean, ps: Seq[Point]) =
     withDefaultSparkSession(implicit spark => emma.onSpark {
-      evaluate.recall(h)(DataBag(ps))
+      eval.recall(h)(DataBag(ps))
     })
 
   override def actF1Score(h: DVector => Boolean, ps: Seq[Point]) =
     withDefaultSparkSession(implicit spark => emma.onSpark {
-      evaluate.f1score(h)(DataBag(ps))
+      eval.f1score(h)(DataBag(ps))
     })
 }
