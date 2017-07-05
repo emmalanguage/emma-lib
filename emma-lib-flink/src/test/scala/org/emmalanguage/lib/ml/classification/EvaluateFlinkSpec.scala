@@ -22,18 +22,18 @@ import lib.linalg._
 
 class EvaluateFlinkSpec extends EvaluateSpec with FlinkAware {
 
-  override def precision(h: DVector => Boolean, seq: Seq[Point]) =
+  override def actPrecision(h: DVector => Boolean, ps: Seq[Point]) =
     withDefaultFlinkEnv(implicit flink => emma.onFlink {
-      evaluate.precision(h)(testBag(seq))
+      evaluate.precision(h)(DataBag(ps))
     })
 
-  override def recall(h: DVector => Boolean, seq: Seq[Point]) =
+  override def actRecall(h: DVector => Boolean, ps: Seq[Point]) =
     withDefaultFlinkEnv(implicit flink => emma.onFlink {
-      evaluate.recall(h)(testBag(seq))
+      evaluate.recall(h)(DataBag(ps))
     })
 
-  override def f1score(h: DVector => Boolean, seq: Seq[Point]) =
+  override def actF1Score(h: DVector => Boolean, ps: Seq[Point]) =
     withDefaultFlinkEnv(implicit flink => emma.onFlink {
-      evaluate.f1score(h)(testBag(seq))
+      evaluate.f1score(h)(DataBag(ps))
     })
 }
