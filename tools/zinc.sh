@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright © 2014 TU Berlin (emma@dima.tu-berlin.de)
+# Copyright © 2017 TU Berlin (emma@dima.tu-berlin.de)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
